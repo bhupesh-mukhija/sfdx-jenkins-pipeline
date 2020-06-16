@@ -15,11 +15,12 @@ node ('master') {
             }
             
             withEnv(["HOME=${env.WORKSPACE}"]) {
-                withCredentials([file(credentialsId: 'SERVER_KEY_CREDENTALS_ID', variable: 'server_key_file')]) {
+                withCredentials([file(credentialsId: 'SFDX_LOGIN_SECRET', variable: 'server_key_file')]) {
                     def currentPkgSubVerId
                     stage('Authorize DevHub') {
                         echo 'Authorizing DevHub..'
-                        sh "sfdx force:auth:jwt:grant --instanceurl ${SF_INSTANCE_URL_PROD} --clientid ${SF_CONSUMER_KEY} --username ${SF_USERNAME} --jwtkeyfile ${server_key_file} --setdefaultdevhubusername --setalias ${SF_DEVHUB_ORG_ALIAS}"
+                        //sh "sfdx force:auth:jwt:grant --instanceurl ${SF_INSTANCE_URL_PROD} --clientid ${SF_CONSUMER_KEY} --username ${SF_USERNAME} --jwtkeyfile ${server_key_file} --setdefaultdevhubusername --setalias ${SF_DEVHUB_ORG_ALIAS}"
+                        sh "sfdx force:auth:sfdxurl:store --sfdxurlfile ${server_key_file} --setalias ${SF_DEVHUB_ORG_ALIAS} --setdefaultdevhubusername --setdefaultusername"
                     }
 
                     stage('Identify Dependencies') {
