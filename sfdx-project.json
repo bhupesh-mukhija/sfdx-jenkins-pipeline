@@ -12,20 +12,6 @@
                 }
             ]
         },
-        {
-            "path": "force-app1",
-            "package": "Test_Gifter",
-            "versionName": "ver 0.1",
-            "versionNumber": "0.1.0.NEXT",
-            "default": false
-        },
-        {
-            "path": "force-app",
-            "package": "package1",
-            "versionName": "ver 0.1",
-            "versionNumber": "0.1.0.NEXT",
-            "default": false
-        }
     ],
     "namespace": "",
     "sfdcLoginUrl": "https://login.salesforce.com",
@@ -36,11 +22,8 @@
         "GIFter@1.1.0-1": "04t1t000003f1BBAAY",
         "GIFter_Ext@0.1.1-1": "04t1t000003f1BGAAY",
         "GIFter@1.1.0-2": "04t1t000003f1BLAAY",
-        "Test_Gifter": "0Ho1r000000k9eMCAQ",
-        "Test_Gifter@0.1.0-1": "04t1r000000XqBkAAK",
         "GIFter@1.1.0-5": "04t1r000000XqBpAAK",
         "GIFter_Ext@0.1.1-2": "04t1r000000XqBzAAK",
         "GIFter@1.1.0-6": "04t1r000000XqC4AAK",
-        "package1": "0Ho1r000000k9eRCAQ"
     }
 }
