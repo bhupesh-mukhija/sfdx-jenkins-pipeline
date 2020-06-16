@@ -66,9 +66,10 @@ node ('master') {
 
                     stage('Create Scratch Org and install dependencies') {
                         sh "sfdx force:org:create --targetdevhubusername=${SF_DEVHUB_ORG_ALIAS} --type=scratch --setalias=${SCRATCH_ORG_ALIAS} --durationdays=1 --definitionfile=config/project-scratch-def.json --json"
+
                         for (int iterator = 0; iterator < package_dependencies.size(); iterator++) {
                             // TODO: DECIDE ON --upgradetype, --securitytype and way to parameterize these values
-                            sh "sfdx force:package:install --targetusername=${SF_DEVHUB_ORG_ALIAS} --package=${package_dependencies[iterator]} --noprompt --upgradetype=DeprecateOnly --securitytype=AllUsers --apexcompile=all"
+                            sh "sfdx force:package:install --targetusername=${SCRATCH_ORG_ALIAS} --package=${package_dependencies[iterator]} --noprompt --upgradetype=DeprecateOnly --securitytype=AllUsers --apexcompile=all"
                             //package_dependencies[iterator]
                         }
                     }
