@@ -7,6 +7,10 @@ node ('master') {
     def SF_INSTANCE_URL_PROD=env.SF_INSTANCE_URL_PROD
     def SF_CONSUMER_KEY=env.SF_CONSUMER_KEY
     def SF_DEVHUB_ORG_ALIAS='HubOrg'
+    def SCRATCH_ORG_ALIAS='sorg'
+    // TODO: BELOW SHOULD BE PARAMETERISED
+    def INSTALL_WAIT=10
+    // TODO: INSTALLATION KEYS
 
     docker.image('myjenkins/node').inside {
         node ('master') {
@@ -39,16 +43,25 @@ node ('master') {
                             def jsonSlurper = new JsonSlurperClassic()
                             list = jsonSlurper.parseText(queryOutput).result.records[0].Dependencies.ids
                             for (int iterator = 0; iterator < list.size(); iterator++) {
-                                //echo "${list[i].subscriberPackageVersionId}"
                                 package_dependencies[iterator] = list[iterator].subscriberPackageVersionId
                             }
+                            // TODO: FETCH INSTALLATION KEYS WHEREVER APPLICABLE
                         } else {
                             echo "No dependencies found, move to next stage"
                         }
                     }
 
-                    stage('Create Scratch Org') {
-                        sh "sfdx force:org:create --targetdevhubusername=${SF_DEVHUB_ORG_ALIAS} --type=scratch --setalias=sorg --durationdays=1 --definitionfile=config/project-scratch-def.json --json"
+                    stage('Create Scratch Org and install dependencies') {
+                        sh "sfdx force:org:create --targetdevhubusername=${SF_DEVHUB_ORG_ALIAS} --type=scratch --setalias=${SCRATCH_ORG_ALIAS} --durationdays=1 --definitionfile=config/project-scratch-def.json --json"
+                        for (int iterator = 0; iterator < package_dependencies.size(); iterator++) {
+                            // TODO: DECIDE ON --upgradetype, --securitytype and way to parameterize these values
+                            sh "sfdx force:package:install --targetusername=${SF_DEVHUB_ORG_ALIAS} --package=${package_dependencies[iterator]} --noprompt --upgradetype=DeprecateOnly --securitytype=AllUsers --apexcompile=all"
+                            //package_dependencies[iterator]
+                        }
+                    }
+
+                    stage('Validate Source') {
+                        sh "sfdx force:source:push --targetusername=${SF_DEVHUB_ORG_ALIAS}"
                     }
                 }
             }
