@@ -10,9 +10,10 @@ node ('master') {
 
     docker.image('myjenkins/node').inside {
         node ('master') {
-            /*stage('checkout source') {
+            stage('checkout source') {
                 checkout scm
-            }*/
+            }
+            
             withEnv(["HOME=${env.WORKSPACE}"]) {
                 withCredentials([file(credentialsId: 'SERVER_KEY_CREDENTALS_ID', variable: 'server_key_file')]) {
                     def currentPkgSubVerId
