@@ -29,25 +29,38 @@ node ('master') {
 
                     stage('Identify Dependencies') {
                         echo 'Identifying Dependencies..'
+                        echo 'Find latest package subscriber versions..'
                         queryOutput = sh returnStdout: true, script: "sfdx force:data:soql:query -u ${SF_DEVHUB_ORG_ALIAS} -t -q \"SELECT Id, SubscriberPackageVersionId, CreatedDate FROM Package2Version WHERE Package2Id='${PACKAGE_ID}' ORDER BY CreatedDate DESC\" --json"
                         
                         if (queryOutput) {
                             def jsonSlurper = new JsonSlurperClassic()
-                            currentPkgSubVerId = jsonSlurper.parseText(queryOutput).result.records[0].SubscriberPackageVersionId
+                            def jsonOutput = jsonSlurper.parseText(queryOutput)
+                            if (jsonOutput.status == 0 && jsonOutput.result.size > 0) {
+                                currentPkgSubVerId = jsonOutput.result.records[0].SubscriberPackageVersionId
+                            } else {
+                                echo "No package subscriber versions found for the specified package id ${PACKAGE_ID}"
+                            }
                             //echo "${currentPkgSubVerId}"
                         } else {
-                            error "No package subscriber versions found for the specified package id ${PACKAGE_ID}"
+                            echo "No package subscriber versions found for the specified package id ${PACKAGE_ID}"
                         }
-                        queryOutput = sh returnStdout: true, script: "sfdx force:data:soql:query -u ${SF_DEVHUB_ORG_ALIAS} -t -q \"SELECT Dependencies FROM SubscriberPackageVersion WHERE Id='${currentPkgSubVerId}'\" --json"
-                        if (queryOutput) {
-                            def jsonSlurper = new JsonSlurperClassic()
-                            list = jsonSlurper.parseText(queryOutput).result.records[0].Dependencies.ids
-                            for (int iterator = 0; iterator < list.size(); iterator++) {
-                                package_dependencies[iterator] = list[iterator].subscriberPackageVersionId
+                        if (currentPkgSubVerId) {
+                            queryOutput = sh returnStdout: true, script: "sfdx force:data:soql:query -u ${SF_DEVHUB_ORG_ALIAS} -t -q \"SELECT Dependencies FROM SubscriberPackageVersion WHERE Id='${currentPkgSubVerId}'\" --json"
+                            if (queryOutput) {
+                                def jsonSlurper = new JsonSlurperClassic()
+                                def jsonOutput = jsonSlurper.parseText(queryOutput)
+                                if (jsonOutput.status == 0 && jsonOutput.result.size > 0) {
+                                    def list = jsonOutput.result.records[0].Dependencies.ids
+                                    for (int iterator = 0; iterator < list.size(); iterator++) {
+                                        package_dependencies[iterator] = list[iterator].subscriberPackageVersionId
+                                    }
+                                    // TODO: FETCH INSTALLATION KEYS WHEREVER APPLICABLE
+                                } else {
+                                    echo "No dependencies found, move to next stage"
+                                }
+                            } else {
+                                echo "No dependencies found, move to next stage"
                             }
-                            // TODO: FETCH INSTALLATION KEYS WHEREVER APPLICABLE
-                        } else {
-                            echo "No dependencies found, move to next stage"
                         }
                     }
 
