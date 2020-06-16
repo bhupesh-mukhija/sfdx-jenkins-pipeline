@@ -19,7 +19,7 @@ node ('master') {
             }
             
             withEnv(["HOME=${env.WORKSPACE}"]) {
-                withCredentials([file(credentialsId: 'SFDX_LOGIN_SECRET', variable: 'server_key_file')]) {
+                withCredentials([file(credentialsId: 'SFDX_LOGIN_SECRET1', variable: 'server_key_file')]) {
                     def currentPkgSubVerId
                     stage('Authorize DevHub') {
                         echo 'Authorizing DevHub..'
