@@ -75,7 +75,7 @@ node ('master') {
                     }
 
                     stage('Validate Source') {
-                        sh "sfdx force:source:push --targetusername=${SF_DEVHUB_ORG_ALIAS}"
+                        sh "sfdx force:source:push --targetusername=${SCRATCH_ORG_ALIAS}"
                     }
                 }
             }
