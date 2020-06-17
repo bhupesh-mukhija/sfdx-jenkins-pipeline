@@ -11,6 +11,7 @@ node ('master') {
     def SF_INSTANCE_URL_PROD=env.SF_INSTANCE_URL_PROD
     def SF_CONSUMER_KEY=env.SF_CONSUMER_KEY
     def SF_DEVHUB_ORG_ALIAS='HubOrg'
+    def SCRATCH_ORG_ALIAS='sorg'
     
     stage ('Parallel Builds')
     parallel(
